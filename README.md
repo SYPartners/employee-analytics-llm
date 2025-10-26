@@ -23,7 +23,7 @@ This project leverages state-of-the-art Large Language Models (LLMs) to provide 
                            ↓
 ┌─────────────────────────────────────────────────────────┐
 │         Data Preparation (Instruction Format)            │
-│              scripts/create_finetuning_data.py           │
+│              scripts/prepare_training_data.py           │
 └─────────────────────────────────────────────────────────┘
                            ↓
 ┌─────────────────────────────────────────────────────────┐
@@ -63,7 +63,7 @@ pip install -r requirements.txt
 Convert your employee CSV data to instruction-following format:
 
 ```bash
-python scripts/create_finetuning_data.py \
+python scripts/prepare_training_data.py \
     --input employee_data.csv \
     --train_output train_dataset.jsonl \
     --val_output val_dataset.jsonl
@@ -181,7 +181,7 @@ employee-analytics-llm/
 │   ├── LLM_APPROACHES.md        # Different LLM strategies
 │   └── GPT_OSS_120B_SPECS.md    # Model specifications
 ├── scripts/                     # Utility scripts
-│   └── create_finetuning_data.py # Data preparation script
+│   └── prepare_training_data.py # Data preparation script
 └── examples/                    # Example code and notebooks
     └── (coming soon)
 ```
