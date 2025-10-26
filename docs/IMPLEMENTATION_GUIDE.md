@@ -251,11 +251,68 @@ It is recommended to use a containerized environment (like Docker or Apptainer) 
 
 During fine-tuning and inference, it is important to monitor the performance of your DGX Spark systems. Use tools like `nvidia-smi` and `nvtop` to monitor GPU utilization, memory usage, and temperature.
 
-## 7. Conclusion
+## 7. Docker Deployment (Recommended for DGX Spark)
+
+For a robust and reproducible environment on your DGX Spark systems, using Docker is highly recommended. The repository now includes a `Dockerfile`.
+
+### 7.1. Building the Docker Image
+
+On one of your DGX Spark systems (or any machine with Docker and NVIDIA Container Toolkit installed), navigate to the repository root and build the image:
+
+```bash
+# Ensure you are logged into the NVIDIA NGC registry if using a private base image
+# docker login nvcr.io
+
+# Build the Docker image
+docker build -t gpt-oss-analytics:latest .
+```
+
+### 7.2. Running the Distributed Fine-Tuning Job with Docker
+
+The fine-tuning process requires two containers to communicate across the network. You must run the container with network host mode and mount the necessary volumes.
+
+**Prerequisites:**
+1.  Ensure both DGX Spark systems have the `gpt-oss-analytics:latest` image.
+2.  The data (`data/train_dataset.jsonl`, etc.) must be accessible to both containers (e.g., mounted from a shared network drive or copied locally).
+
+**On DGX Spark 1 (Master Node):**
+
+```bash
+docker run --gpus all --network host --ipc=host \
+    -v /path/to/your/repo/data:/app/data \
+    -v /path/to/your/repo/employee_analytics_model:/app/employee_analytics_model \
+    gpt-oss-analytics:latest \
+    /bin/bash -c "chmod +x scripts/launch_distributed_training.sh && scripts/launch_distributed_training.sh 0 <IP_ADDRESS_OF_SPARK_1>"
+```
+
+**On DGX Spark 2 (Worker Node):**
+
+```bash
+docker run --gpus all --network host --ipc=host \
+    -v /path/to/your/repo/data:/app/data \
+    -v /path/to/your/repo/employee_analytics_model:/app/employee_analytics_model \
+    gpt-oss-analytics:latest \
+    /bin/bash -c "chmod +x scripts/launch_distributed_training.sh && scripts/launch_distributed_training.sh 1 <IP_ADDRESS_OF_SPARK_1>"
+```
+
+*Note: Replace `/path/to/your/repo/...` with the actual absolute path on your host machines.*
+
+### 7.3. Running Inference with Docker
+
+For inference, you only need to run the container on a single DGX Spark:
+
+```bash
+docker run --gpus all --network host --ipc=host \
+    -v /path/to/your/repo/employee_analytics_model:/app/employee_analytics_model \
+    gpt-oss-analytics:latest \
+    python3 examples/inference_two_stage.py
+```
+
+## 8. Conclusion
 
 By following this guide, you can leverage the state-of-the-art capabilities of OpenAI's `gpt-oss-120b` model to build a powerful and insightful employee analytics platform. This approach not only promises higher accuracy than traditional methods but also offers a level of interpretability and personalization that can transform your HR strategies. Your two NVIDIA DGX Spark systems provide the perfect foundation for this cutting-edge work.
 
-## 8. References
+## 9. References
 
 [1] Ma, X., Liu, W., Zhao, C., & Tukhvatulina, L. R. (2024). *Can Large Language Model Predict Employee Attrition?* arXiv preprint arXiv:2411.01353. [https://arxiv.org/abs/2411.01353](https://arxiv.org/abs/2411.01353)
 

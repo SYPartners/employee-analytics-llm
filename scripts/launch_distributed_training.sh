@@ -28,8 +28,8 @@ echo "NNODES: $NNODES"
 echo "NPROC_PER_NODE: $NPROC_PER_NODE"
 echo "----------------------------------------"
 
-# Ensure all dependencies are installed
-pip install -r requirements.txt
+# NOTE: Dependencies are installed inside the Docker container.
+# This script assumes you have built the Docker image and are running it.
 
 # Run the distributed training job
 torchrun \
@@ -38,7 +38,7 @@ torchrun \
     --node_rank=$NODE_RANK \
     --master_addr=$MASTER_ADDR \
     --master_port=$MASTER_PORT \
-    scripts/finetune_model.py \
+    python3 scripts/finetune_model.py \
     --model_name $MODEL_NAME \
     --train_file $TRAIN_FILE \
     --val_file $VAL_FILE \

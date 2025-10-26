@@ -38,6 +38,23 @@ This project leverages state-of-the-art Large Language Models (LLMs) to provide 
 ```
 
 ## Quick Start
+### Docker Deployment (Recommended)
+
+For a consistent environment, use the provided `Dockerfile`.
+
+1. **Build the image**:
+```bash
+docker build -t gpt-oss-analytics:latest .
+```
+
+2. **Run Fine-Tuning** (see [Implementation Guide](docs/IMPLEMENTATION_GUIDE.md) for full command):
+```bash
+# On Spark 1:
+docker run --gpus all --network host ... scripts/launch_distributed_training.sh 0 <IP_ADDR>
+# On Spark 2:
+docker run --gpus all --network host ... scripts/launch_distributed_training.sh 1 <IP_ADDR>
+```
+
 
 ### Prerequisites
 
